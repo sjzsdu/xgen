@@ -2,9 +2,11 @@ import type { TableProps } from 'antd'
 import type { Action, Common } from '@/types'
 
 export declare namespace TableType {
+	type SelectMode = 'multiple' | 'single'
+
 	interface Filter {
 		columns: Array<Common.WideColumn>
-		actions?: Array<{ action: Array<Action.ActionParams> } & Pick<Action.Props, 'title' | 'icon'>>
+		actions?: Array<{ action: Array<Action.ActionParams> } & Pick<Action.Props, 'title' | 'icon' | 'props'>>
 	}
 
 	interface Header {
@@ -23,6 +25,12 @@ export declare namespace TableType {
 					preview_setting_model: string
 				}
 				actions?: Array<{ action: Array<Action.ActionParams> } & Pick<Action.Props, 'title' | 'icon'>>
+			}
+			column?: {
+				musts: string[]
+			}
+			filter?: {
+				musts: string[]
 			}
 		}
 		actions?: Array<{

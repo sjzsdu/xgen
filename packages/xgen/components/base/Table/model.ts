@@ -94,7 +94,6 @@ export default class Model {
 
 	async save(data: TableType.SaveRequest) {
 		const hideLoading = message.loading(this.global.locale_messages.messages.table.save.loading)
-
 		const { res, err } = await this.table.save<TableType.SaveRequest, TableType.SaveResponse>(this.model, data)
 
 		hideLoading()

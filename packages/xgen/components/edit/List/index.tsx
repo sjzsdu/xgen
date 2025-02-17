@@ -42,7 +42,7 @@ const List = window.$app.memo(
 
 			props.onChange(v)
 
-			setValue(v)
+			setValue(Array.isArray(v) ? v : v.data)
 		})
 
 		return (

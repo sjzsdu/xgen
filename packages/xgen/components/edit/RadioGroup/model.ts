@@ -4,10 +4,12 @@ import { injectable } from 'tsyringe'
 import { Remote } from '@/models'
 
 import type { RadioGroupProps } from 'antd'
+import { ICheckboxOption } from '../CheckboxGroup/model';
+
 
 @injectable()
 export default class Index {
-	get options(): RadioGroupProps['options'] {
+	get options(): ICheckboxOption[] {
 		return this.remote.options
 	}
 

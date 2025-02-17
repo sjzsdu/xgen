@@ -12,6 +12,8 @@ import { useOnValuesChange } from './hooks'
 import styles from './index.less'
 
 import type { IPropsPureForm, IPropsActions, IPropsSections, IPropsReference } from './types'
+import { FormContext } from './form_context'
+import Detail from '../Detail'
 import Frame from '../Frame'
 import { useGlobal } from '@/context/app'
 
@@ -152,20 +154,22 @@ const Index = (props: IPropsPureForm) => {
 						<Frame {...frame} data={data} />
 					</Then>
 					<Else>
-						<Form
-							className='w_100'
-							form={form}
-							name={namespace}
-							disabled={disabled}
-							layout='vertical'
-							initialValues={initialValues}
-							onValuesChange={onValuesChange}
-							style={form_styles}
-						>
-							<div className='form_wrap w_100 border_box'>
-								<Sections {...props_sections}></Sections>
-							</div>
-						</Form>
+						<FormContext.Provider value={form}>
+							<Form
+								className='w_100'
+								form={form}
+								name={namespace}
+								disabled={disabled}
+								layout='vertical'
+								initialValues={initialValues}
+								onValuesChange={onValuesChange}
+								style={form_styles}
+							>
+								<div className='form_wrap w_100 border_box'>
+									<Sections {...props_sections}></Sections>
+								</div>
+							</Form>
+						</FormContext.Provider>
 						<When condition={!!form_props?.reference}>
 							<Reference {...props_reference}></Reference>
 						</When>

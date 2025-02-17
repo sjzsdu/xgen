@@ -4,6 +4,7 @@ import RowItem from './RowItem'
 
 import type { IPropsTabsItem, IPropsRowItem } from '../types'
 import Text from './Text'
+import { hasRule } from '@/actions'
 
 const Index = (props: IPropsTabsItem) => {
 	const { namespace, primary, type, item } = props
@@ -19,11 +20,13 @@ const Index = (props: IPropsTabsItem) => {
 			<Tabs
 				className='w_100'
 				animated
-				items={item.tabs.map((it, idx) => ({
-					label: <Text {...it} text={it.title || ''} />,
-					key: it.title! + idx,
-					children: <RowItem {...props_row_item} columns={it.columns}></RowItem>
-				}))}
+				items={item.tabs
+					.filter((tab) => hasRule({ rule_id: tab.rule }))
+					.map((it, idx) => ({
+						label: <Text {...it} text={it.title || ''} />,
+						key: it.title! + idx,
+						children: <RowItem {...props_row_item} columns={it.columns}></RowItem>
+					}))}
 			></Tabs>
 		</Col>
 	)

@@ -18,6 +18,8 @@ import Model from './model'
 import type { Component } from '@/types'
 import type { IPropsPureForm } from '@/components/base/PureForm/types'
 import type { IPropsBreadcrumb, IPropsAnchor } from './types'
+import { actionsInMenu } from '@/actions'
+import { GlobalModel } from '@/context/app'
 import { Bind, Dot } from '@/utils'
 import { useGlobal } from '@/context/app'
 import { IPropsActions } from '../PureForm/types'
@@ -26,6 +28,7 @@ import Actions from '../PureForm/components/Actions'
 const Index = (props: Component.FormComponent) => {
 	const { parent, parentNamespace, model, id, form, onBack } = props
 	const [x] = useState(() => container.resolve(Model))
+	const [g] = useState(() => container.resolve(GlobalModel))
 	const locale = getLocale()
 	const page_title_prefix = usePageTitle(Message(locale), id!, form!.type)
 	const hooks = useHooks(toJS(x.setting.hooks!), toJS(x.setting.fields), toJS(x.data))
@@ -100,6 +103,9 @@ const Index = (props: Component.FormComponent) => {
 		sections: toJS(x.setting.form.sections)
 	}
 
+	if (!x.setting.form) return null
+	const actions = toJS(x.setting.actions) || []
+	const filterActions = actionsInMenu(actions, toJS(g.user))
 	const props_form: IPropsPureForm = {
 		parent,
 		namespace: x.namespace.value,
@@ -108,7 +114,7 @@ const Index = (props: Component.FormComponent) => {
 		id: x.id,
 		data: toJS(x.data),
 		sections: toJS(x.sections),
-		actions: toJS(x.setting.actions),
+		actions: filterActions,
 		frame: toJS(x.setting.form.frame),
 		hooks,
 		title,

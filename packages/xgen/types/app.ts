@@ -297,6 +297,10 @@ export declare namespace App {
 		mobile?: any
 		name: string
 		type: string
+		rule_ids?: number[]
+		department_ids?: number[]
+		role_ids?: number[]
+		[key: string]: any
 	}
 
 	interface Menu {

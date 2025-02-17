@@ -34,7 +34,7 @@ export default class Index {
 			ns && bind && name ? `${ns}|${bind}|${name}|${new URLSearchParams(params).toString()}` : undefined
 		const session_key = `${remote.api}|${new URLSearchParams(params).toString()}`
 
-		if (local.remote_cache) {
+		if (local.remote_cache && !this.raw_props.xProps?.nocache) {
 			const session_cache: any = decode(sessionStorage.getItem(session_key))
 			if (session_cache) return (this.options = session_cache)
 		}

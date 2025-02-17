@@ -1,6 +1,6 @@
 import type { Remote } from '@/types'
 import type { SelectProps } from 'antd'
-
+import Model from './model'
 export interface IProps extends Remote.IProps, SelectProps {
 	extend?: boolean
 	extendValue?: boolean
@@ -14,6 +14,7 @@ export interface ICustom extends SelectProps {
 	xProps: Remote.XProps
 	extend?: boolean
 	getOptions?: Promise<any>
+	x: Model
 }
 
 export interface IPropsExtend {

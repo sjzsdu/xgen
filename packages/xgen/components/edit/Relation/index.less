@@ -1,0 +1,55 @@
+._local {
+	width: 100%;
+	:global {
+		.xgen-space {
+			display: flex;
+			// background-color: white;
+			.xgen-space-item:first-child {
+				flex: 1;
+			}
+		}
+		.xgen-input-search-button {
+			height: 36px;
+		}
+	}
+
+	&.multiple {
+		:global {
+			.xgen-select-selector {
+				.xgen-select-selection-item {
+					line-height: 22px;
+				}
+			}
+		}
+	}
+}
+
+.inedit {
+	:global {
+		.xgen-space {
+			background-color: white;
+		}
+	}
+}
+
+.noadd {
+	:global {
+		.xgen-space {
+			background-color: var(--color_bg) !important;
+		}
+	}
+}
+
+
+._dropdown {
+	:global {
+		.xgen-select-item-option-selected:not(.xgen-select-item-option-disabled) {
+			background-color: transparent;
+			color: var(--color_main);
+		}
+	}
+}
+
+.select {
+	flex: 1;
+}

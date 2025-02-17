@@ -48,7 +48,44 @@ const Index = (props: IProps) => {
 						parentNamespace: namespace,
 						model: config.Form.model,
 						id,
-						form: { type: config.Form.type },
+						form: {
+							type: config.Form.type,
+							data: config.Form.data,
+							initValue: config.Form.initValue
+						},
+						onBack
+					}}
+				></X>
+			</GlobalProvider>
+		)
+
+		return (
+			<AntdProvider>
+				<If condition={!!config.byDrawer}>
+					<Then>
+						<DrawerWrap {...props_modal_wrap}>{content}</DrawerWrap>
+					</Then>
+					<Else>
+						<ModalWrap {...props_modal_wrap}>{content}</ModalWrap>
+					</Else>
+				</If>
+			</AntdProvider>
+		)
+	}
+
+	if (config.Table) {
+		const content = (
+			<GlobalProvider>
+				<X
+					type='base'
+					name='Table'
+					props={{
+						parent: 'Modal',
+						parentNamespace: namespace,
+						model: config.Table.model,
+						id,
+						table: { type: config.Table.type },
+						selectMode: config.Table.selectMode,
 						onBack
 					}}
 				></X>

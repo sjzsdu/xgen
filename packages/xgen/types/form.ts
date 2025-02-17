@@ -21,6 +21,7 @@ export declare namespace FormType {
 		icon?: string | { name: string; size?: number }
 		color?: string
 		weight?: number | string
+		rule?: string
 		columns: Array<ColumnResult>
 	}
 

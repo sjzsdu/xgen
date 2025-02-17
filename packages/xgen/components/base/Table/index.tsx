@@ -11,12 +11,17 @@ import { CustomAction } from './components'
 import styles from './index.less'
 import Model from './model'
 
-import type { Component } from '@/types'
+import type { Component, TableType } from '@/types'
 
 import type { IPropsFilter } from '@/components/base/Filter/types'
 import type { IPropsPureTable } from '@/components/base/PureTable/types'
 import type { Global } from '@/types'
 import type { IPropsCustomAction } from './types'
+import { GlobalModel } from '@/context/app'
+import { actionsInMenu } from '@/actions'
+import { sortedColumn } from '@/utils'
+import { local } from '@/../storex/dist'
+import ModalFilter from '../ModalFilter'
 
 export interface IProps extends Component.StackComponent {
 	query?: Global.StringObject
@@ -24,11 +29,27 @@ export interface IProps extends Component.StackComponent {
 	namespace?: string
 	hidePagination?: IPropsPureTable['hidePagination']
 	onChangeEventName?: string
+	selectMode: TableType.SelectMode
+	onBack?: () => void
 }
 
 const Index = (props: IProps) => {
-	const { parent, model, search_params, query, data, namespace, hidePagination, onChangeEventName } = props
+	const {
+		parent,
+		model,
+		search_params,
+		selectMode,
+		query,
+		data,
+		namespace,
+		hidePagination,
+		onChangeEventName,
+		onBack
+	} = props
+	console.log('table props', props)
 	const [x] = useState(() => container.resolve(Model))
+	const [g] = useState(() => container.resolve(GlobalModel))
+	const [selects, setSelects] = useState([])
 
 	useLayoutEffect(() => {
 		x.init(parent, model, query, data, namespace, search_params!, onChangeEventName)
@@ -41,7 +62,11 @@ const Index = (props: IProps) => {
 	const setBatchSelected = useMemoizedFn((v: Array<number>) => (x.batch.selected = v))
 	const onFinish = useMemoizedFn((v: any) => {
 		x.resetSearchParams()
-
+		for (let o in v) {
+			if (Array.isArray(v[o])) {
+				v[o] = v[o].join(',')
+			}
+		}
 		window.$app.Event.emit(`${x.namespace.value}/search`, v)
 	})
 	const resetSearchParams = useMemoizedFn(x.resetSearchParams)
@@ -52,27 +77,35 @@ const Index = (props: IProps) => {
 	})
 
 	if (!x.setting.table) return null
+	const operation = toJS(x.setting.table.operation)
+	operation.actions = actionsInMenu(operation.actions, toJS(g.user))
 
+	const localKey = 'custom_table_columns:' + x.namespace.value
 	const props_table: IPropsPureTable = {
+		setSelects,
 		parent,
 		namespace: x.namespace.value,
 		primary: x.setting.primary,
 		list: toJS(x.list),
-		columns: toJS(x.table_columns),
+		columns: sortedColumn(toJS(x.table_columns), local[localKey]),
 		pagination: toJS(x.pagination),
 		props: toJS(x.setting.table.props),
-		operation: toJS(x.setting.table.operation),
+		operation,
 		batch: toJS(x.batch),
 		hidePagination,
+		selectMode,
 		setBatchSelected
 	}
 
+	const localFilterKey = 'custom_filter_columns:' + x.namespace.value
+	const filter = toJS(x.setting.filter)
+	filter.actions = filter?.actions?.length ? actionsInMenu(filter.actions, toJS(g.user)) : []
 	const props_filter: IPropsFilter = {
 		parent,
 		model: x.model,
 		namespace: x.namespace.value,
-		columns: toJS(x.filter_columns),
-		actions: toJS(x.setting.filter?.actions),
+		columns: sortedColumn(toJS(x.filter_columns), local[localFilterKey]),
+		actions: filter.actions,
 		onFinish,
 		resetSearchParams
 	}
@@ -111,6 +144,31 @@ const Index = (props: IProps) => {
 			<div className={clsx([styles._local, compact_style, with_total_row, 'w_100 flex flex_column'])}>
 				<Filter {...props_filter}></Filter>
 				<PureTable {...props_table}></PureTable>
+			</div>
+		)
+	}
+
+	if (parent === 'Modal') {
+		const afterSelect = (bool: boolean) => {
+			if (onBack) {
+				onBack()
+			}
+			if (bool) {
+				window.$app.Event.emit(x.namespace.value + '/select', selects)
+			}
+		}
+		return (
+			<div
+				className={clsx([
+					styles._local,
+					styles._modal,
+					compact_style,
+					with_total_row,
+					'w_100 flex flex_column'
+				])}
+			>
+				<ModalFilter {...props_filter} afterSelect={afterSelect}></ModalFilter>
+				<PureTable {...props_table} type='modal' selectMode={selectMode}></PureTable>
 			</div>
 		)
 	}

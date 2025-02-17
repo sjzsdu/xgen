@@ -31,18 +31,18 @@ const Index = (props: IProps) => {
 		setOptions(_options)
 	}
 
-	const onOk = () => {
+	const onOk = async () => {
 		const v = pickBy(getFieldsValue())
 
 		if (!Object.keys(v).length) return
 
-		window.$app.Event.emit(`${namespace}/batchUpdate`, v)
+		await window.$app.Event.emit(`${namespace}/batchUpdate`, v)
 
 		setBatchActive(false)
 	}
 
-	const onDelete = () => {
-		window.$app.Event.emit(`${namespace}/batchDelete`)
+	const onDelete = async () => {
+		await window.$app.Event.emit(`${namespace}/batchDelete`)
 
 		setBatchActive(false)
 	}
@@ -79,11 +79,11 @@ const Index = (props: IProps) => {
 		<Modal
 			wrapClassName={styles.modal_batch}
 			open={visible_modal}
-                  title='批量编辑'
-                  onCancel={() => setVisibleModal(false)}
+			title='批量编辑'
+			onCancel={() => setVisibleModal(false)}
 			footer={Footer}
-                  centered
-                  destroyOnClose
+			centered
+			destroyOnClose
 		>
 			<div className='select_wrap w_100 border_box flex flex_wrap'>
 				{options.map((item, index) => (

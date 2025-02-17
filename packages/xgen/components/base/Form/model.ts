@@ -154,7 +154,15 @@ export default class Model {
 
 		this.getSetting()
 
-		if (this.id !== 0) this.find()
+		if (form?.data) {
+			this.data = form.data
+		} else {
+			if (Number(id) !== 0) {
+				this.find()
+			} else {
+				this.data = form?.initValue ?? {}
+			}
+		}
 
 		this.onBack = onBack
 		this.on()

@@ -1,0 +1,33 @@
+._local {
+	:global {
+		.xgen-select-tree {
+			background-color: white;
+			.xgen-select-tree-selection-placeholder {
+				line-height: var(--base_height);
+			}
+
+			.xgen-select-tree-selection-item {
+				line-height: var(--base_height);
+			}
+		}
+	}
+
+	&.multiple {
+		:global {
+			.xgen-select-tree-selector {
+				.xgen-select-tree-selection-item {
+					line-height: 22px;
+				}
+			}
+		}
+	}
+}
+
+._dropdown {
+	:global {
+		.xgen-select-tree-treenode-selected:not(.xgen-select-tree-treenode-disabled) {
+			background-color: transparent;
+			color: var(--color_main);
+		}
+	}
+}

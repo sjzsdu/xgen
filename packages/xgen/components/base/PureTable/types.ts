@@ -1,6 +1,6 @@
 import type Model from '@/components/base/Table/model'
 import type { TableColumnType } from 'antd'
-import type { Common } from '@/types'
+import type { Common, TableType } from '@/types'
 
 export interface IPropsPureTable {
 	parent: Model['parent']
@@ -14,6 +14,9 @@ export interface IPropsPureTable {
 	batch: Model['batch']
 	hidePagination?: boolean
 	setBatchSelected: (v: Array<number>) => void
+	type?: string
+	selectMode?: TableType.SelectMode
+	setSelects: Function
 }
 
 export interface IPropsBlock {

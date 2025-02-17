@@ -50,9 +50,21 @@ const Custom = window.$app.memo((props: ICustom) => {
 	}
 
 	useEffect(() => {
-		if (__value === undefined || __value === null) return
+		if (!__value) {
+			if (props.id && props.id.indexOf('filter') > 0) {
+				return
+			}
+			const itemValue =
+				props.mode === 'multiple'
+					? rest_props.options?.filter((item) => item.selected).map((item) => item.value)
+					: rest_props.options?.find((item) => item.selected)?.value
+			if (itemValue) {
+				setValue(itemValue)
+			}
+			return
+		}
 		setValue(__value)
-	}, [props.mode, __value])
+	}, [props.mode, __value, rest_props.options])
 
 	useEffect(() => {
 		setOptions(parseOptions(props.options))

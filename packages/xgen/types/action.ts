@@ -1,4 +1,4 @@
-import { Global } from '@/types'
+import { Global, TableType } from '@/types'
 
 export declare namespace Action {
 	interface OpenModal {
@@ -8,11 +8,18 @@ export declare namespace Action {
 			type: 'view' | 'edit'
 			model: string
 			id?: number | string
+			data: { [key: string]: any }
+			initValue: Global.AnyObject
 		}
 		Page?: {
 			type: 'chart'
 			model: string
 			id?: number | string
+		}
+		Table?: {
+			type: 'view' | 'edit'
+			model: string
+			selectMode?: TableType.SelectMode
 		}
 	}
 
@@ -103,5 +110,14 @@ export declare namespace Action {
 			bind: string
 			value: string | Array<string>
 		}
+		props: Global.AnyObject
+		confirm?: { title: string; desc: string }
+	}
+
+	interface AccessData {
+		rule_id?: number | number[]
+		role_id?: number | number[]
+		department_id?: number | number[]
+		[key: string]: any
 	}
 }

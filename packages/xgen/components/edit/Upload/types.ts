@@ -27,8 +27,18 @@ export interface IProps extends UploadProps, Component.PropsEditComponent, Commo
 	api: string
 }
 
+export interface CosParam {
+	tokenUrl: string
+	uploadUrl: string
+	region: string
+	bucket: string
+	keyFormat: string
+}
+
 export interface CustomProps extends UploadProps, CommonProps {
 	api: string | { api: string; params: any }
+	cos?: CosParam
+	[key: string]: any
 	placeholder?: string // the placeholder for the upload
 	placeholderIcon?: string | { name: string; size: number } // the placeholder icon for the upload
 	maxFilesize?: number | string // the max filesize for the upload

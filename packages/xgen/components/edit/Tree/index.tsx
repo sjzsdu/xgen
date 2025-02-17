@@ -19,23 +19,46 @@ interface CustomProps extends TreeProps {
 }
 
 const Custom = window.$app.memo((props: CustomProps) => {
-	const [value, setValue] = useState<TreeProps['checkedKeys']>()
+	const [value, setValue] = useState<TreeProps['checkedKeys']>(props.value || [])
 
 	useEffect(() => {
-		if (!props.value) return
-
-		setValue(props.value)
+		if (props.value) {
+			setValue(props.value)
+		}
 	}, [props.value])
 
-	const onChange = (v: TreeProps['checkedKeys']) => {
-		if (!props.onChange) return
-
-		props.onChange(v)
-
-		setValue(v)
+	const getAllKeys = (nodes: TreeProps['treeData'] = []) => {
+		let keys: React.Key[] = []
+		const traverse = (nodes: TreeProps['treeData'] = []) => {
+			nodes.forEach((node) => {
+				keys.push(node.key)
+				if (node.children) {
+					traverse(node.children)
+				}
+			})
+		}
+		traverse(nodes)
+		return keys
 	}
 
-	return <Tree {...props} checkedKeys={value} onCheck={onChange}></Tree>
+	const onChange = (v: TreeProps['checkedKeys'], e: any) => {
+		console.log('tree check', v, e)
+		let checkedKeys: React.Key[] = Array.isArray(v) ? v : v?.checked || []
+
+		if (e.node.children) {
+			const childKeys = getAllKeys(e.node.children)
+			if (e.checked) {
+				checkedKeys = [...new Set([...checkedKeys, ...childKeys])]
+			} else {
+				checkedKeys = checkedKeys.filter((key) => !childKeys.includes(key))
+			}
+		}
+
+		setValue(checkedKeys)
+		props.onChange(checkedKeys)
+	}
+
+	return <Tree checkStrictly={true} {...props} checkedKeys={value} onCheck={onChange}></Tree>
 })
 
 const Index = (props: IProps) => {

@@ -1,7 +1,7 @@
 import { useMemoizedFn } from 'ahooks'
 import { Upload } from 'antd'
 import clsx from 'clsx'
-
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { Item } from '@/components'
 import { getToken } from '@/knife'
 import type {
@@ -20,8 +20,9 @@ import { LocalRequest, S3Request } from './request'
 import type { UploadFile, UploadProps } from 'antd'
 import type { IProps, CustomProps, IPropsUploadBtn, PreviewProps, AllowedFileType } from './types'
 import { IRequest, UploadError } from './request/types'
-import { useState } from 'react'
-
+import { container } from 'tsyringe'
+import Model from './model'
+import type { UploadRequestOption } from 'rc-upload/lib/interface'
 import styles from './index.less'
 import { ParseSize } from './request/storages/utils'
 
@@ -37,17 +38,26 @@ const Custom = window.$app.memo((props: CustomProps) => {
 		previewURL,
 		useAppRoot,
 		__shadow,
-		onChange: trigger
+		onChange: trigger,
+		cos,
+		filetype = 'image'
 	} = props
 
 	const { list, setList } = useList(props.value, previewURL, useAppRoot, api)
 	const visible_btn = useVisibleBtn(list.length, maxCount || 1)
-	const filetype = filemap[props.filetype] ? props.filetype : 'image'
 	const [error, setError] = useState<UploadError | undefined>(undefined)
 	const [progress, setProgress] = useState<UploadProgressEvent>(
 		new ProgressEvent('progress', { loaded: 0, total: 0 })
 	)
 	const [request, setRequest] = useState<IRequest | undefined>(undefined)
+	const [x] = useState(() => container.resolve(Model))
+
+	useLayoutEffect(() => {
+		if (cos) {
+			x.cos = cos
+			x.init()
+		}
+	}, [cos])
 
 	const onChange: UploadProps['onChange'] = useMemoizedFn(({ file, fileList }) => {
 		const { status } = file
@@ -110,16 +120,13 @@ const Custom = window.$app.memo((props: CustomProps) => {
 			setError({ code: code, message: 'Upload failed' })
 		}
 
-		// If storage is provided, then it should be a s3 request
 		if (storage) {
 			const request: IRequest = new S3Request(storage)
 			request.Upload && request.Upload(options)
 			return
 		}
 
-		// If api is provided, then it should be a local request
 		if (api) {
-			// if api is string, then it should be a local request
 			if (typeof api === 'string') {
 				const request = new LocalRequest({ chunkSize, previewURL, useAppRoot, api })
 				request.Upload && request.Upload(options)
@@ -127,15 +134,28 @@ const Custom = window.$app.memo((props: CustomProps) => {
 				return
 			}
 
-			// if api is object, then it should be a local request
 			const request = new LocalRequest({ chunkSize, previewURL, useAppRoot, ...api })
 			request.Upload && request.Upload(options)
 			setRequest(request)
+			return
 		}
 
-		// Return error if no storage or api provided
-		setError({ code: 400, message: 'No storage or api provided' })
+		if (cos) {
+			x.putObject(options as UploadRequestOption)
+			return
+		}
+
+		setError({ code: 400, message: 'No storage, api or cos provided' })
 	})
+
+	const action = useMemo(() => {
+		if (cos) {
+			return x.uploadUrl
+		}
+		if (typeof api === 'string') return api
+
+		return api ? `${api.api}?${new URLSearchParams(api.params).toString()}` : undefined
+	}, [api, cos, x.cosToken])
 
 	const props_upload: UploadProps = {
 		...props,
@@ -147,10 +167,10 @@ const Custom = window.$app.memo((props: CustomProps) => {
 		isImageUrl: () => filetype === 'image',
 		customRequest,
 		beforeUpload,
-		onChange
+		onChange,
+		action
 	}
 
-	// The preview props for the custom render
 	const size = fmtSize(previewSize || imageSize, filetype)
 	const preview_props: PreviewProps = {
 		size: size,
@@ -168,7 +188,6 @@ const Custom = window.$app.memo((props: CustomProps) => {
 		return filemap[filetype].preview(preview_props, file, removeFile, abort, { progress, error })
 	}
 
-	// Compute the props for the upload button
 	const props_upload_btn: IPropsUploadBtn = {
 		filetype,
 		maxCount,

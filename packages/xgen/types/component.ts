@@ -19,7 +19,7 @@ export declare namespace Component {
 
 	interface StackComponent extends BaseComponent {
 		id?: string
-		form?: { type: FormType }
+		form?: { type: FormType; data: Global.AnyObject; initValue: Global.AnyObject }
 	}
 
 	interface FormComponent extends StackComponent {

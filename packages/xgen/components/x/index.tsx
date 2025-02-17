@@ -2,6 +2,7 @@ import { message } from 'antd'
 import { lazy, Suspense, useEffect, useMemo } from 'react'
 
 import type { Global } from '@/types'
+import { firstWordUppercase } from '@/utils'
 import { ExportComponents } from '@/components/exports' // Import the components for shadow dom and dynamic import
 
 type ComponentsType = 'base' | 'edit' | 'view' | 'chart' | 'group' | 'optional'
