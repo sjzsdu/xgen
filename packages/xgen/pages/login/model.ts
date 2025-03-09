@@ -52,7 +52,7 @@ export default class Model {
 
 			return
 		}
-
+		
 		// Save sid
 		if (res.sid) {
 			local.temp_sid = res.sid
